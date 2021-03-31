@@ -6,13 +6,14 @@
 
 int main()
 {
-	// ћассив содержит частоты встречаемости символов.
+	// chars_frequency[i] - Is frequency of character whose code is 'i'
 	int chars_frequency[ASCII_TABLE_CAPACITY];
 
-	// ћассив содержит коды символов, которые одновременно €вл€ютс€
-	// индексами массива chars_freuqency.
+	// Array of char codes.
+	// char_codes[n] - Is char code, whose frequency is char_requency[ char_codes[n] ]
 	int char_codes[ASCII_TABLE_CAPACITY];
 
+	// Arrays initialisation
 	for (int idx = 0; idx < ASCII_TABLE_CAPACITY; ++ idx)
 	{
 		chars_frequency[idx] = 0;
@@ -21,18 +22,18 @@ int main()
 
 	int current_char = 0;
 
+	// Input
 	while ((current_char = getchar()) != EOF)
 	{
 		chars_frequency[current_char] += 1;
 	}
 
-	// ¬нешний цикл по элементам массива.
+	// Sorting MAX to MIN
 	for (int idx_position = 0; idx_position < ASCII_TABLE_CAPACITY - 1; ++ idx_position)
 	{	
 		int idx_max_frequency = 0;
 		int max_frequency     = 0;
 
-		// цикл поиска максимального элемента в оставшейс€ части массива
 		for (int i = idx_position + 1; i < ASCII_TABLE_CAPACITY; ++ i)
 		{
 			int frequency = chars_frequency[char_codes[i]];
@@ -44,8 +45,6 @@ int main()
 			}
 		}
 
-		// ≈сли максимальное значение найденное в оставшейс€ части масива
-		// больше значени€ текущего элемента массива, то мен€ем их индексы местами.
 		if (max_frequency > chars_frequency[char_codes[idx_position]])
 		{
 			int buf = char_codes[idx_position];
@@ -55,6 +54,7 @@ int main()
 		}
 	}
 
+	// Calculate width and height of histogram
 	int histo_width  = 0;
 	int histo_height = 0;
 
@@ -73,6 +73,7 @@ int main()
 		}
 	}
 
+	// Histogram print
 	for (int current_height = histo_height; current_height > 0; -- current_height)
 	{
 		int f = 0;
