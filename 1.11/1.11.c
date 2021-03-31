@@ -1,7 +1,7 @@
 #include <stdio.h>
 
-#define IN  1 /* внутри слова */
-#define OUT 0 /* вне слова    */
+#define IN  1
+#define OUT 0
 
 int main()
 {
