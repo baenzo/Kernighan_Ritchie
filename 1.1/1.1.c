@@ -2,6 +2,6 @@
 
 int main()
 {
-	printf("My name is PROG.");
+	printf("Hello World!");
 	return 0;
 }
