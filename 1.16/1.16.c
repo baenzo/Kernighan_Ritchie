@@ -26,8 +26,10 @@ int main()
 	if (max_length > 0)
 	{
 		printf("\nMax length: %d\n", max_length);
-		printf("%s\n", longest_string);
+		printf("%s", longest_string);
 	}
+
+	return 0;
 }
 
 void copy_line(char src[], char dest[])
@@ -39,12 +41,11 @@ void copy_line(char src[], char dest[])
 		dest[i] = src[i];
 	}
 
-	dest[i + 1] = '\0';
+	dest[i] = '\0';
 }
 
 int get_line(char line[], int limit)
 {
-	// Проверка параметра на корректность.
 	if (limit <= 0) return -1;
 
 	int counter = 0;
