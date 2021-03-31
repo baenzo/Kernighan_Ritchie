@@ -20,7 +20,6 @@ int main()
 
 int get_line(char line[], int limit)
 {
-	// Проверка параметра на корректность.
 	if (limit <= 0) return -1;
 
 	int counter = 0;
