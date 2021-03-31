@@ -12,8 +12,8 @@ int main()
 		{
 			if (spaces_counter == 0)
 			{
-				++spaces_counter;
 				putchar(c);
+				++spaces_counter;
 			}
 		}
 		else
