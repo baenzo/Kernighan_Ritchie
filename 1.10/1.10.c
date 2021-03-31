@@ -14,9 +14,9 @@ int main()
 		{
 			printf("\\\\");
 		}
-		else if (c == '\n')
+		else if (c == '\b')
 		{
-			printf("\\n\n");
+			printf("\\b");
 		}
 		else
 		{
