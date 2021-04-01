@@ -4,8 +4,6 @@
 int main()
 {
 	int c;
-
-	//int out_counter = 0;
 	int pos_in_tab_field = 0;
 
 	while ((c = getchar()) != '\n' && c != EOF)
