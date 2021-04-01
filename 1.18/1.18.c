@@ -1,5 +1,7 @@
 #include <stdio.h>
 #define STRING_BUFFER_SIZE 200
+#define STATE_IN 1
+#define STATE_OUT 0
 
 int get_line(char line[], int limit);
 
@@ -9,23 +11,30 @@ int main()
 
 	while (get_line(string_buffer, STRING_BUFFER_SIZE) > 0)
 	{
-		int out_counter = 0;
+		unsigned int current_length = 0;
+		int state = STATE_IN;
 		char c;
 
 		for (int i = 0; (c = string_buffer[i]) != '\0'; ++i)
 		{
-			if (c == ' ' || c == '\t')
+			if (c == '\n' && current_length == 0)
 			{
-				if (out_counter == 0)
+				continue;
+			}
+			else if (c == ' ' || c == '\t')
+			{
+				if (state == STATE_IN)
 				{
 					putchar(' ');
-					++out_counter;
+					state = STATE_OUT;
+					++current_length;
 				}
 			}
 			else
 			{
 				putchar(c);
-				out_counter = 0;
+				state = STATE_IN;
+				++current_length;
 			}
 		}
 	}
@@ -33,7 +42,6 @@ int main()
 
 int get_line(char line[], int limit)
 {
-	// Проверка параметра на корректность.
 	if (limit <= 0) return -1;
 
 	int counter = 0;
