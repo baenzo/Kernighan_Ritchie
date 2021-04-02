@@ -12,12 +12,12 @@ void output(const char buffer[], int start_idx, int count, FILE* file);
 
 int main(int argc, char* argv[])
 {
-	char* input_file_name = NULL;
+	char* input_file_name  = NULL;
 	char* output_file_name = NULL;
 
 	if (argc >= 3)
 	{
-		input_file_name = argv[1];
+		input_file_name  = argv[1];
 		output_file_name = argv[2];
 	}
 	else
@@ -26,81 +26,81 @@ int main(int argc, char* argv[])
 		return 0;
 	}
 
-	FILE* input_file;
-	FILE* output_file;
+	FILE* input_file  = NULL;
+	FILE* output_file = NULL;
 
-	_set_errno(0);
+	int error_code = 0;
 
 	if (fopen_s(&input_file, input_file_name, "r") != 0 || input_file == NULL)
 	{
-		printf("Cannot open file %s\n", input_file_name);
-		perror("Error");
-		return _get_errno();
+		_get_errno(&error_code);
+		printf("Cannot open file \'%s\'\n", input_file_name);
+		perror("");
+		return error_code;
 	}
-
-	_set_errno(0);
 
 	if (fopen_s(&output_file, output_file_name, "w") != 0 || output_file == NULL)
 	{
-		printf("Cannot open file %s\n", output_file_name);
-		perror("Error");
-		return _get_errno();
+		_get_errno(&error_code);
+		printf("Cannot open file \'%s\'\n", output_file_name);
+		perror("");
+		return error_code;
 	}
 
-	// Основной буфер
+	// Main buffer
 	char buffer[INPUT_BUFFER_SIZE];
 	
-	/* Буфер слова.
-	 * В буфер слова сохраняется последнее слово из основного буфера
-	 * при выполнении следующих условий:
+	/* Word buffer.
+	 * A word from the main buffer can be saved to this buffer if the all conditions are met:
 	 *
-	 *		1. строка не пуста
-	 *		2. в строке есть свободное место
-	 *		3. длина слова равна длине свободного места в строке
+	 *		1. Word is the last word in the main buffer.
+	 *		2. Line is not empty.
+	 *		3. There is free space in the line.
+	 *		4. The word length is equal to the length of the free space in the line.
 	 */
 	char word_buffer[LINE_LENGTH];
 
-	// Длина слова в буффере слова
-	char last_word_length = 0;
+	// Word length. (Word in the word buffer)
+	unsigned int last_word_length = 0;
 
-	// Флаг
-	//		true  - текущее слово является хвостом предыдущего
-	//		false - текущее слово НЕ является хвостом предыдущего
+	/* Flag
+	 *		true  - the current word is the tail of the previous word;
+	 *		false - the current word is not the tail of the previous word;
+	 */
 	bool word_tail = false;
 
-	// Индекс первого свободного места в строке
+	// Index of the beginning free space in the line
 	int position_in_line = 0;
 
-	// Главный цикл
 	while (feof(input_file) == 0)
 	{
 		int count = fread_s(buffer, INPUT_BUFFER_SIZE, READ_ELEMENT_SIZE, INPUT_BUFFER_SIZE, input_file);
 
 		if (count != INPUT_BUFFER_SIZE && ferror(output_file) != 0)
 		{
-			perror("Error");
+			_get_errno(&error_code);
+			perror("File read error");
 			break;
 		}
 
-		// Цикл обработки основного буфера
+		// The cycle of the main buffer processing
 		for (int IDX = 0; IDX < count; ++IDX)
 		{
 			const char c = buffer[IDX];
 
 			if (IDX == 0 && last_word_length > 0)
 			{
-				// Первая итерация цикла обработки основного буфера. Буфер слова содержит слово.
+				// If first iteration and word buffer is not empty.
 
 				if (c != ' ' && c != '\t' && c != '\n')
 				{
-					// Текущий символ не явл-ся пробельным => текущее слово явл-ся хвостом
-					// слова, сохраненного в буфере слова => выполняем перенос на новую строку
+					// The current character is non-blank => the current word is the tail of the
+					// previous word that is stored in the word buffer => new line
 					fputc('\n', output_file);
 					position_in_line = 0;
 					word_tail = true;
 				}
 
-				// Выводим слово из буфера слова.
 				output(word_buffer, 0, last_word_length, output_file);
 				position_in_line += last_word_length;
 				last_word_length = 0;
@@ -140,19 +140,13 @@ int main(int argc, char* argv[])
 			}
 			else
 			{
-				// Встретили слово
-
 				bool last_word_in_buffer = false;
 
 				int word_length = next_word_length(buffer, count, IDX, &last_word_in_buffer);
 				int free_space_in_line = LINE_LENGTH - position_in_line;
 
 				if (free_space_in_line == 0)
-				{
-					// Свободного места в строке НЕТ
-					// Выполняем перенос на новую строку. Откатываем индекс цикла обработки
-					// основного буфера на единицу назад и уходим на след. итерацию.
-					
+				{					
 					fputc('\n', output_file);
 					position_in_line = 0;
 					--IDX;
@@ -160,27 +154,18 @@ int main(int argc, char* argv[])
 				}
 				else if (free_space_in_line < LINE_LENGTH)
 				{
-					// Строка не пуста, но свободное место есть
-
 					if (word_length < free_space_in_line) 
-					{
-						// Свободного места в строке больше чем необходимо для вывода слова
-						
+					{		
 						output(buffer, IDX, word_length, output_file);
 						position_in_line += word_length;
 						IDX = IDX + word_length - 1;
 
-						// Если слово было хвостом, то сбрасываем флаг
 						if (word_tail == true) word_tail = false;
 					}
 					else if (word_length == free_space_in_line)
 					{
-						// Свободного места в строке ровно столько сколько надо для вывода слова
-						
 						if (last_word_in_buffer == true && word_tail == false)
 						{
-							// Слово в буфере последнее и не является хвостом предыдущего слова
-							
 							last_word_length = word_length;
 
 							for (int i = 0; i < word_length; ++i)
@@ -192,23 +177,17 @@ int main(int argc, char* argv[])
 						}
 						else
 						{
-							// Слово в буфере НЕ последнее И/ИЛИ является хвостом предыдущего слова
-							
 							output(buffer, IDX, word_length, output_file);
 							position_in_line += word_length;
 							IDX = IDX + word_length - 1;
 
-							// Если слово было хвостом, то сбрасываем флаг
 							if (word_tail == true) word_tail = false;
 						}
 					}
 					else if (word_length > free_space_in_line && word_tail == false)
 					{
-						// Свободного места в строке недостаточно для вывода слова
-						
 						if (word_tail == true)
 						{
-							// Слово-хвост. Выводим его часть равную длине свободного места в строке.
 							output(buffer, IDX, free_space_in_line, output_file);
 							position_in_line += free_space_in_line;
 							IDX = IDX + free_space_in_line - 1;
@@ -216,9 +195,6 @@ int main(int argc, char* argv[])
 						}
 						else
 						{
-							// Выполняем перенос на новую строку. Откатываем индекс цикла обработки
-							// основного буфера на единицу назад и уходим на след. итерацию.
-
 							fputc('\n', output_file);
 							position_in_line = 0;
 							--IDX;
@@ -228,8 +204,6 @@ int main(int argc, char* argv[])
 				}
 				else if (free_space_in_line == LINE_LENGTH)
 				{
-					// Строка пуста
-
 					int count_to_write = 0;
 
 					if (word_length >= free_space_in_line)
@@ -249,35 +223,31 @@ int main(int argc, char* argv[])
 		}
 	}
 
-	if (last_word_length > 0)
+	if (error_code == 0)
 	{
-		// Выводим слово из буфера слова.
-		output(word_buffer, 0, last_word_length, output_file);
+		if (last_word_length > 0)
+		{
+			output(word_buffer, 0, last_word_length, output_file);
+		}
 	}
 
 	fclose(input_file);
 	fclose(output_file);
 
-	return 0;
+	return error_code;
 }
 
 int next_word_length(const char buffer[], int buffer_size, int start_pos, bool* last_word_in_buffer)
 {
-	if (last_word_in_buffer == NULL)
-	{
-		return 0;
-	}
+	if (last_word_in_buffer == NULL) return 0;
 
 	int word_length = 0;
-
 	int i;
 
 	for (i = start_pos; i < buffer_size; ++i)
 	{
 		char c = buffer[i];
-
 		if (c == ' ' || c == '\t' || c == '\n') break;
-
 		++word_length;
 	}
 
