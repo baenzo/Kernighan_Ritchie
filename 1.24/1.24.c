@@ -3,13 +3,6 @@
 
 #define READ_ELEMENT_SIZE 1
 #define WRITE_ELEMENT_SIZE 1
-
-//#define STRING_LITERAL_START '\"'
-//#define STRING_LITERAL_END   '\"'
-
-//#define CHARACTER_CONST_START '\''
-//#define CHARACTER_CONST_END   '\''
-
 #define ESCAPE_SIGN '\\'
 
 int main(int argc, char* argv[])
@@ -48,22 +41,19 @@ int main(int argc, char* argv[])
 	
 	unsigned int multi_line_comment_length = 0;
 
-	int curly_brackets  = 0; // {}
-	int round_brackets  = 0; // ()
-	int square_brackets = 0; // []
-	int double_quotes = 0;   // ""
-	int single_quotes = 0;   // ''
+	int curly_brackets     = 0; // {}
+	int round_brackets     = 0; // ()
+	int square_brackets    = 0; // []
+	int double_quotes      = 0; // ""
+	int single_quotes      = 0; // ''
 	int multiline_comments = 0; // /**/
 
 	while ((current_char = fgetc(input_file)) != EOF)
 	{
 		if (in_single_line_comment == false && in_multi_line_comment == false)
 		{
-			// Находимся вне комментария
-
 			if (in_string_literal == true)
 			{
-				// Находимся в строковом литерале
 				if (current_char == '\"' && previous_char != ESCAPE_SIGN)
 				{
 					--double_quotes;
@@ -72,7 +62,6 @@ int main(int argc, char* argv[])
 			}
 			else if (in_character_const == true)
 			{
-				// Находимся в символьной константе
 				if (current_char == '\'' && previous_char != ESCAPE_SIGN)
 				{
 					--single_quotes;
@@ -81,17 +70,13 @@ int main(int argc, char* argv[])
 			}
 			else
 			{
-				// Вне комментария, вне строки и вне символьного литерала
-
 				if (current_char == '\"')
 				{
-					// Встретили начало строкового литерала
 					++double_quotes;
 					in_string_literal = true;
 				}
 				else if (current_char == '\'')
 				{
-					// Встретили начало символьной константы
 					++single_quotes;
 					in_character_const = true;
 				}
@@ -137,7 +122,7 @@ int main(int argc, char* argv[])
 		}
 		else
 		{
-			// Находимся в комментарии
+			// In the comment
 
 			if (in_single_line_comment == true)
 			{
