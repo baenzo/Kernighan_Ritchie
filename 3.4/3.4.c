@@ -1,3 +1,17 @@
+/*
+In a two's complement number representation, our version of itoa
+does not handle the largest negative number, that is, the value
+of N equal to -(2^(wordsize-1)) because two's complement code
+allows to represent numbers from -(2 ^ (wordsize - 1)) to 2 ^ (wordsize - 1) - 1.
+This indicates that the modulus of the largest negative number
+is greater than the modulus of the maximum positive number.Therefore,
+changing the sign on the line of code
+
+		n = -n;
+
+will not work correctly.
+*/
+
 #include <stdio.h>
 #include <limits.h>
 #include <stdint.h>
@@ -39,28 +53,27 @@ void itoa(int n, char s[])
 	int i = 0;
 	int sign = n;
 
-	if (sign < 0) n = -n; //
-
 	do
 	{
 		s[i++] = n % 10 + '0';
-	} while ((n /= 10) > 0);
-//	} while ((n /= 10) != 0);
+	} while ((n /= 10) != 0);
 
 	if (sign < 0)
 	{
-		/*for (int j = 0; j < i; j++)
+		for (int j = 0; j < i; j++)
 		{
 			s[j] = 2 * '0' - s[j];
-		}*/
+		}
 
 		s[i++] = '-';
 	}
 
 	s[i] = '\0';
 
-	for (int c, tail = 0, head = i - 1; tail < head; tail++, head--)
+	for (int tail = 0, head = i - 1; tail < head; tail++, head--)
 	{
-		c = s[tail], s[tail] = s[head], s[head] = c;
+		char c = s[tail];
+		s[tail] = s[head];
+		s[head] = c;
 	}
 }
