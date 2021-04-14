@@ -5,36 +5,17 @@ void itob(int n, char s[], int b);
 
 int main()
 {
-	int m = -1759584 + 1;
-	int radix = 8;
+	char str[50];
 
-	printf("Num: %d\n\n", m);
+	int n = 132754;
+	int base = 5;
 
-	do
-	{
-		int mod_radix = m % radix;
-		printf("%11d mod %d = %d  |  %d + %d - 1 = %d \n", m, radix, mod_radix, mod_radix, radix, mod_radix + radix - 1);
-		m /= radix;
-	} while (m != 0);
+	printf("Num: %d\n\n", n);
 
-
-	/*char str[20];
-	int n = -2147483647;
-	n = --n;
-	
-	_itoa_s(n, str, 20, 8);
-	printf("%s\n", str);
-	
-	for (int i = 0; i < 20; i++)
-		str[i] = 0;
-
-	itob(n, str, 8);
-	char c;
-
-	for (int i = 19; i >= 0; i--)
-	{
-		printf(" %d ", str[i]);
-	}*/
+	itob(n, str, base);
+	printf("\n   itob(): %15s\n", str);
+	_itoa_s(n, str, 50, base);
+	printf("_itoa_s(): %15s\n", str);
 	
 	return 0;
 }
@@ -43,15 +24,40 @@ int main()
 
 void itob(int n, char s[], int b)
 {
-	int sign = n;
+	//int sign = n;
 	int i = 0;
 
-	if (n < 0) n = -(n + 1);
+	if (n < 0)
+	{
+		n = n + 1;
+
+		int t, width;
+
+		for (t = -n, width = 0; t > 0; width++)
+		{
+			t <<= 1;
+		}
+
+		printf("width = %d\n", width);
+	}
 
 	do
 	{
-		s[i++] = b - 1 - n % b;
-	} while ((n /= b) != 0);
+		int mod_base = n % b;
+		int digit = mod_base + b - 1;
+		s[i++] = '0' + digit;
+
+		//printf("%11d mod %d = %2d  |  %2d + %d - 1 = %d \n", n, b, mod_base, mod_base, b, digit);
+		
+		n /= b;
+	} while (n != 0);
 
 	s[i] = '\0';
+
+	for (int tail = 0, head = i - 1; tail < head; tail++, head--)
+	{
+		char c = s[tail];
+		s[tail] = s[head];
+		s[head] = c;
+	}
 }
