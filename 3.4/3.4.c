@@ -55,18 +55,18 @@ void itoa(int n, char s[])
 
 	do
 	{
-		s[i++] = n % 10 + '0';
+		s[i++] = n % 10;
 	} while ((n /= 10) != 0);
 
-	if (sign < 0)
+	for (int j = 0; j < i; j++)
 	{
-		for (int j = 0; j < i; j++)
-		{
-			s[j] = 2 * '0' - s[j];
-		}
-
-		s[i++] = '-';
+		if (sign < 0)
+			s[j] = -s[j] + '0';
+		else
+			s[j] += '0';
 	}
+
+	if (sign < 0) s[i++] = '-';
 
 	s[i] = '\0';
 
